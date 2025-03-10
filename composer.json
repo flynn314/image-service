@@ -1,0 +1,19 @@
+{
+    "name": "flynn314/image-service",
+    "description": "Image service for resizing/cropping images using Imagine.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+		"ext-gd": "*",
+		"laravel/framework": "*",
+        "imagine/imagine": "^1.3"
+    },
+    "autoload": {
+		"psr-4": {
+			"Flynn314\\Service\\": "src"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true
+}
