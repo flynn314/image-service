@@ -109,6 +109,15 @@ final class ImageService
         return $img->crop($cropPoint, $cropBox)->resize(new Box($targetSize, $targetSize))->get($format, ['quality' => $quality]);
     }
 
+    public function getMimeTypeByContent(string $content): string
+    {
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_buffer($fileInfo, $content);
+        finfo_close($fileInfo);
+
+        return $mime;
+    }
+
     private function calculateMaxSizes($originalWidth, $originalHeight, $maxWidth = 512, $maxHeight = 512): Box
     {
         // Calculate aspect ratio
