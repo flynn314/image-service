@@ -8,6 +8,12 @@ use Imagine\Image\Point;
 
 final class ImageService
 {
+    private const array EXIF_SUPPORTED_BY = [
+        'jpeg',
+        'jpg',
+        'tiff',
+    ];
+
     public function resizeImage(string $url, int $maxWidth, int $maxHeight, string $format = 'jpeg', int $quality = 90): string
     {
         $imagine = new \Imagine\Gd\Imagine();
@@ -15,18 +21,20 @@ final class ImageService
         // $imagine = new \Imagine\Gmagick\Imagine();
         $img = $imagine->open($url);
 
-        $exifData = @exif_read_data($url);
-        if ($exifData && isset($exifData['Orientation'])) {
-            switch ($exifData['Orientation']) {
-                case 3:
-                    $img->rotate(180);
-                    break;
-                case 6:
-                    $img->rotate(90);
-                    break;
-                case 8:
-                    $img->rotate(-90);
-                    break;
+        if (in_array($format, [self::EXIF_SUPPORTED_BY])) {
+            $exifData = @exif_read_data($url);
+            if ($exifData && isset($exifData['Orientation'])) {
+                switch ($exifData['Orientation']) {
+                    case 3:
+                        $img->rotate(180);
+                        break;
+                    case 6:
+                        $img->rotate(90);
+                        break;
+                    case 8:
+                        $img->rotate(-90);
+                        break;
+                }
             }
         }
 
@@ -40,9 +48,9 @@ final class ImageService
         // $imagine = new \Imagine\Gmagick\Imagine();
         $img = $imagine->load($binary);
 
-        $tmpFileaname = storage_path('tmp_' . time());
-        file_put_contents($tmpFileaname, $binary);
-        if (file_exists($tmpFileaname)) {
+        if (in_array($format, [self::EXIF_SUPPORTED_BY])) {
+            $tmpFileaname = storage_path('tmp_' . time());
+            file_put_contents($tmpFileaname, $binary);
             $exifData = @exif_read_data($tmpFileaname);
             unlink($tmpFileaname);
             if ($exifData && isset($exifData['Orientation'])) {
@@ -75,23 +83,25 @@ final class ImageService
         // $imagine = new \Imagine\Gmagick\Imagine();
         $img = $imagine->load($binary);
 
-        $tmpFileaname = storage_path('tmp_' . time());
-        file_put_contents($tmpFileaname, $binary);
-        $exifData = @exif_read_data($tmpFileaname);
-        if (file_exists($tmpFileaname)) {
-            unlink($tmpFileaname);
-        }
-        if ($exifData && isset($exifData['Orientation'])) {
-            switch ($exifData['Orientation']) {
-                case 3:
-                    $img->rotate(180);
-                    break;
-                case 6:
-                    $img->rotate(90);
-                    break;
-                case 8:
-                    $img->rotate(-90);
-                    break;
+        if (in_array($format, [self::EXIF_SUPPORTED_BY])) {
+            $tmpFileaname = storage_path('tmp_' . time());
+            file_put_contents($tmpFileaname, $binary);
+            $exifData = @exif_read_data($tmpFileaname);
+            if (file_exists($tmpFileaname)) {
+                unlink($tmpFileaname);
+            }
+            if ($exifData && isset($exifData['Orientation'])) {
+                switch ($exifData['Orientation']) {
+                    case 3:
+                        $img->rotate(180);
+                        break;
+                    case 6:
+                        $img->rotate(90);
+                        break;
+                    case 8:
+                        $img->rotate(-90);
+                        break;
+                }
             }
         }
 
